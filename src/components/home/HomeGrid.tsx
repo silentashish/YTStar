@@ -23,17 +23,38 @@ interface Props {
   subscriber?: string;
   country?: string;
   type?: string;
+  videos?: any;
 }
 
 const HomeGrid: React.FC<Props> = (props) => {
-  const {title, image, details, link, age, subscriber, country, type} = props;
+  const {
+    title,
+    image,
+    details,
+    link,
+    age,
+    subscriber,
+    country,
+    type,
+    videos,
+  } = props;
   const navigation = useNavigation();
 
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() =>
-        navigation.navigate('NewsDetail', {title, image, details, link})
+        navigation.navigate('Details', {
+          title,
+          image,
+          details,
+          link,
+          age,
+          subscriber,
+          country,
+          type,
+          videos,
+        })
       }>
       <View style={styles.txtContain}>
         <Text style={styles.heading} numberOfLines={2}>
