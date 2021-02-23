@@ -4,6 +4,7 @@ const LillyImage = require('../assets/lilysing.jpg');
 const CaseyImage = require('../assets/casey.jpeg');
 const stringData: any = [
   {
+    id: 1,
     title: 'Logan Paul',
     age: '24',
     details:
@@ -25,6 +26,7 @@ const stringData: any = [
     type: 'LifeStyle / Vlogging',
   },
   {
+    id: 2,
     title: 'David Dobrik',
     age: '23',
     details:
@@ -46,6 +48,7 @@ const stringData: any = [
     type: 'LifeStyle / Vlogging',
   },
   {
+    id: 3,
     title: 'Lilly Singh',
     age: '24',
     details:
@@ -67,6 +70,7 @@ const stringData: any = [
     type: 'LifeStyle / Vlogging',
   },
   {
+    id: 4,
     title: 'Casey Neistat',
     age: '39',
     details:

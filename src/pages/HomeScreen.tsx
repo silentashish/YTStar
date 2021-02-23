@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Image,
   ScrollView,
@@ -14,12 +14,30 @@ import {HomeGrid} from '../components/home';
 import NewsGrid from '../components/news/NewsGrid';
 import {backgroundColor} from '../constants/colors';
 import {stringData} from '../data';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useFocusEffect} from '@react-navigation/native';
 interface props {
   children?: JSX.Element;
 }
 
 const HomeScreen: React.FC<props> = () => {
+  const [AsyncData, setAsyncData] = useState<any>([]);
+
+  const getAsyncData = async () => {
+    const allData: string | null = await AsyncStorage.getItem('starred');
+    if (allData) {
+      setAsyncData(JSON.parse(allData));
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const unsubscribe = getAsyncData();
+
+      return () => unsubscribe;
+    }, []),
+  );
+
   return (
     <View style={styles.container}>
       <Header>Youtube Stars</Header>
@@ -29,7 +47,13 @@ const HomeScreen: React.FC<props> = () => {
         <Divider large />
         {/* <View> */}
         {stringData.map((item: any) => {
-          return <HomeGrid {...item} />;
+          return (
+            <HomeGrid
+              {...item}
+              AsyncData={AsyncData}
+              getAsyncData={() => getAsyncData()}
+            />
+          );
         })}
         {/* </View> */}
         <Divider />

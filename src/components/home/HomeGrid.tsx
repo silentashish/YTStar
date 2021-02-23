@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,9 @@ import {
 } from 'react-native';
 import {Divider} from '../common';
 import {useNavigation} from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {backgroundColor} from '../../constants/colors';
 interface Props {
   children?: JSX.Element;
   title?: string;
@@ -24,6 +26,9 @@ interface Props {
   country?: string;
   type?: string;
   videos?: any;
+  id: number;
+  AsyncData?: any;
+  getAsyncData?: any;
 }
 
 const HomeGrid: React.FC<Props> = (props) => {
@@ -37,8 +42,69 @@ const HomeGrid: React.FC<Props> = (props) => {
     country,
     type,
     videos,
+    id,
+    AsyncData,
+    getAsyncData,
   } = props;
   const navigation = useNavigation();
+
+  // get all starred data at the beginning
+  const getStarredData = () => {
+    console.log('Async data us', AsyncData, typeof AsyncData);
+    if (AsyncData) {
+      const selected: boolean = AsyncData?.reduce((acc: any, item: Props) => {
+        if (acc === true) return true;
+        if (id === item.id) {
+          return true;
+        }
+        return false;
+      }, false);
+      return selected;
+    }
+    return false;
+  };
+
+  const starred: boolean | undefined = React.useMemo(() => getStarredData(), [
+    image,
+    AsyncData,
+  ]);
+
+  const handleStarPress = async () => {
+    try {
+      if (starred) {
+        const filterData = AsyncData.reduce((acc: any, item: any) => {
+          if (item.id === id) {
+            return acc;
+          } else {
+            return [...acc, item];
+          }
+        }, []);
+        await AsyncStorage.setItem('starred', JSON.stringify(filterData));
+      } else {
+        await AsyncStorage.setItem(
+          'starred',
+          JSON.stringify([
+            ...AsyncData,
+            {
+              title,
+              image,
+              details,
+              link,
+              age,
+              subscriber,
+              country,
+              type,
+              videos,
+              id,
+            },
+          ]),
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    getAsyncData();
+  };
 
   return (
     <TouchableOpacity
@@ -56,6 +122,13 @@ const HomeGrid: React.FC<Props> = (props) => {
           videos,
         })
       }>
+      <Icon
+        onPress={handleStarPress}
+        name={starred ? 'star' : 'star-outline'}
+        color={starred ? '#FFD700' : backgroundColor}
+        size={30}
+        style={styles.iconStyle}
+      />
       <View style={styles.txtContain}>
         <Text style={styles.heading} numberOfLines={2}>
           {title}
@@ -89,6 +162,7 @@ interface Style {
   image: ImageStyle;
   txtContain: ViewStyle;
   comma: TextStyle;
+  iconStyle: ViewStyle;
 }
 
 const styles = StyleSheet.create<Style>({
@@ -102,6 +176,7 @@ const styles = StyleSheet.create<Style>({
     borderColor: 'white',
     flexDirection: 'row',
     overflow: 'hidden',
+    position: 'relative',
   },
   heading: {
     color: 'white',
@@ -129,6 +204,14 @@ const styles = StyleSheet.create<Style>({
     color: 'white',
     fontWeight: 'bold',
     fontFamily: 'notoserif',
+  },
+  iconStyle: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    zIndex: 999,
+    backgroundColor: 'white',
+    borderRadius: 25,
   },
 });
 
